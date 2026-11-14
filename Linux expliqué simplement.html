@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Linux explained simply</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef3fb;--card:#fff;--ink:#14213d;--mute:#4a5878;--line:#c9d4ea;--blue:#1d4ed8;--sun:#f59e0b;--teal:#0f8b7d;--red:#c2410c;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1626;--card:#17233b;--ink:#eaf0ff;--mute:#a9b7d6;--line:#2c3c5e;--blue:#7ea4ff;--sun:#fbbf24;--teal:#43d1bf;--red:#fb923c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1626;--card:#17233b;--ink:#eaf0ff;--mute:#a9b7d6;--line:#2c3c5e;--blue:#7ea4ff;--sun:#fbbf24;--teal:#43d1bf;--red:#fb923c;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 Nunito,system-ui,sans-serif}
+main{max-width:920px;margin:0 auto;padding:0 20px 80px}
+h1,h2,h3{font-family:"Baloo 2",system-ui,sans-serif;line-height:1.15;margin:0}
+h2{font-size:clamp(26px,5vw,38px);margin-bottom:8px}
+p{max-width:62ch;margin:.4em 0}
+section{padding:56px 0 8px}
+.lead{color:var(--mute);font-size:1.05em}
+.card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:20px}
+button{font:inherit;font-weight:700;border:0;border-radius:999px;padding:10px 20px;background:var(--blue);color:#fff;cursor:pointer}
+:root[data-theme="dark"] button,:root:not([data-theme="light"]) button{color:#0e1626}
+@media (prefers-color-scheme:light){button{color:#fff}}
+button.alt{background:transparent;color:var(--ink);border:2px solid var(--line)}
+button:focus-visible,summary:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:center;padding-top:48px}
+.hero h1{font-size:clamp(36px,8vw,64px)}
+.goal{margin-top:18px;border-left:6px solid var(--sun);padding:6px 16px;background:var(--card);border-radius:0 12px 12px 0}
+.tux{font-size:min(38vw,190px);text-align:center;animation:bob 3s ease-in-out infinite;filter:drop-shadow(0 12px 10px rgba(0,0,0,.18))}
+@keyframes bob{50%{transform:translateY(-14px) rotate(-4deg)}}
+
+/* layer demo */
+.stack{display:flex;flex-direction:column;gap:10px;margin:18px 0;position:relative}
+.layer{display:flex;align-items:center;gap:14px;padding:12px 16px;border:2px solid var(--line);border-radius:14px;background:var(--card);transition:.3s}
+.layer .ic{font-size:30px;width:44px;text-align:center}
+.layer b{display:block;font-family:"Baloo 2",sans-serif;font-size:19px;line-height:1.1}
+.layer small{color:var(--mute)}
+.layer.on{border-color:var(--sun);background:color-mix(in srgb,var(--sun) 22%,var(--card));transform:scale(1.03);box-shadow:0 6px 18px rgba(245,158,11,.3)}
+.zone{font-size:13px;font-weight:700;color:var(--mute);padding:2px 6px}
+.zone.k{color:var(--red)}
+.say{min-height:3.2em;font-weight:700;background:var(--card);border:2px dashed var(--line);border-radius:12px;padding:10px 14px}
+.ctrl{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.screen{font-family:ui-monospace,Menlo,Consolas,monospace;background:#0b1220;color:#5eead4;border-radius:10px;padding:8px 14px;min-height:42px;margin-top:10px}
+
+/* history */
+.tl{display:flex;gap:0;overflow-x:auto;padding:30px 4px 10px;margin-top:10px}
+.ev{flex:0 0 150px;text-align:center;position:relative;padding:0 6px;opacity:.25;transform:translateY(12px);transition:.5s}
+.ev.in{opacity:1;transform:none}
+.ev::before{content:"";position:absolute;top:-14px;left:0;right:0;height:4px;background:var(--line)}
+.ev::after{content:"";position:absolute;top:-21px;left:calc(50% - 9px);width:18px;height:18px;border-radius:50%;background:var(--sun)}
+.ev i{font-style:normal;font-size:34px;display:block}
+.ev b{font-family:"Baloo 2";font-size:22px;color:var(--blue)}
+.ev span{display:block;font-size:14px;line-height:1.35;color:var(--mute)}
+
+/* equation */
+.eq{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:14px;margin:18px 0}
+.chip{padding:14px 18px;border-radius:16px;border:2px solid var(--line);background:var(--card);text-align:center;min-width:150px}
+.chip b{font-family:"Baloo 2";font-size:20px;display:block}
+.op{font-size:36px;font-weight:800}
+.chip.res{border-color:var(--teal);opacity:.25;transform:scale(.8);transition:.6s}
+.eq.done .chip.res{opacity:1;transform:scale(1.06)}
+.eq.done .a{animation:snapL .7s}.eq.done .b{animation:snapR .7s}
+@keyframes snapL{from{transform:translateX(-30px)}}@keyframes snapR{from{transform:translateX(30px)}}
+
+.who{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:22px}
+.who h3{font-size:20px}.who small{color:var(--mute)}
+.car{display:flex;align-items:center;justify-content:center;gap:10px;min-height:130px;font-size:56px;margin:14px 0 4px;flex-wrap:wrap}
+.car .part{transition:.7s;opacity:.15;transform:translateY(-30px) scale(.6)}
+.car.full .part{opacity:1;transform:none}
+.car .eng{filter:drop-shadow(0 0 10px var(--sun))}
+.car .whole{display:none;font-size:92px}
+.car.full .whole{display:block;animation:drive 1.6s ease-out}
+.car.full .part,.car.full .eng{display:none}
+@keyframes drive{from{transform:translateX(-90px);opacity:0}}
+.cap{text-align:center;font-weight:700;min-height:3.4em}
+.verdict{margin-top:14px;border:2px solid var(--teal);border-radius:14px;padding:12px 16px;background:color-mix(in srgb,var(--teal) 12%,var(--card))}
+.gnu{display:grid;grid-template-columns:200px 1fr;gap:20px;align-items:center;margin-top:18px}
+.gnu svg{width:200px;height:200px;animation:nod 4s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes nod{50%{transform:rotate(5deg)}}
+.acr{font-family:ui-monospace,Menlo,Consolas,monospace;background:#0b1220;color:#5eead4;border-radius:10px;padding:10px 14px;margin:10px 0;overflow-wrap:anywhere;min-height:3em}
+@media (max-width:640px){.gnu{grid-template-columns:1fr;justify-items:center}}
+/* distros */
+.fam{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:14px}
+.fam h3{font-size:20px;margin-bottom:8px}
+.tag{display:inline-block;margin:3px 3px 0 0;padding:4px 12px;border-radius:999px;background:color-mix(in srgb,var(--blue) 15%,var(--card));font-weight:700;font-size:15px;animation:pulse 3s infinite}
+.tag:nth-child(3n){animation-delay:.6s}.tag:nth-child(3n+1){animation-delay:1.2s}
+@keyframes pulse{50%{transform:translateY(-3px)}}
+.base{margin-top:14px;text-align:center;font-weight:700;padding:12px;border-radius:14px;background:var(--teal);color:#fff}
+:root[data-theme="dark"] .base{color:#0e1626}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .base{color:#0e1626}}
+
+/* terminal */
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:14px}
+.term{background:#0b1220;border-radius:12px;color:#e2e8f0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;overflow:hidden}
+.term .bar{background:#1e293b;padding:6px 12px;font-size:12px}
+.term .body{padding:12px;min-height:110px}
+.type{display:inline-block;overflow:hidden;white-space:nowrap;vertical-align:bottom;width:0;animation:typing 2.5s steps(10) infinite alternate}
+@keyframes typing{to{width:11ch}}
+.nest{border:3px solid var(--sun);border-radius:12px;padding:10px;margin-top:8px;font-size:14px;font-family:Nunito}
+.gui{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px;background:linear-gradient(135deg,#60a5fa,#a78bfa);border-radius:12px;min-height:150px;position:relative}
+.gui span{background:rgba(255,255,255,.85);color:#14213d;border-radius:10px;text-align:center;font-size:26px;padding:6px 0;height:52px}
+.gui em{position:absolute;font-style:normal;font-size:26px;left:30%;top:55%;animation:mouse 4s ease-in-out infinite}
+@keyframes mouse{50%{left:70%;top:20%}}
+
+details{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 16px;margin:10px 0}
+summary{cursor:pointer;font-weight:700}
+details p{color:var(--teal);font-weight:700}
+@media (max-width:640px){.hero{grid-template-columns:1fr}.tux{order:-1;font-size:110px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.ev{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<main>
+
+<header class="hero">
+  <div>
+    <h1>Linux expliqué simplement</h1>
+    <p class="lead">Chapitre 2 · Système d’exploitation 1</p>
+    <div class="goal">
+      <b>Objectif de ce chapitre :</b> comprendre ce qui se passe entre le moment où vous tapez une commande et le moment où le matériel de l’ordinateur fait le travail. Vous verrez qui a créé Linux, de quoi il est fait et comment ses couches coopèrent.
+    </div>
+  </div>
+  <div class="tux" aria-hidden="true">🐧</div>
+</header>
+
+<section>
+  <h2>1. L’idée de base : un restaurant</h2>
+  <p class="lead">Un ordinateur fonctionne comme un restaurant. Vous n’entrez jamais en cuisine : vous passez commande et quelqu’un vous apporte le résultat. Appuyez sur le bouton pour suivre une commande jusqu’en bas, puis son retour.</p>
+  <div class="card">
+    <div class="ctrl">
+      <button id="run">▶ Lancer : afficher « Hello »</button>
+      <button class="alt" id="swap">Passer aux vrais noms</button>
+    </div>
+    <div class="stack" id="stack">
+      <div class="zone">ESPACE UTILISATEUR (là où vivent les programmes)</div>
+      <div class="layer" data-i="0"><span class="ic">🧑‍🍳</span><div><b class="nm">Vous, le client</b><small class="ds">Vous écrivez un programme ou tapez une commande</small></div></div>
+      <div class="layer" data-i="1"><span class="ic">🛎️</span><div><b class="nm">Serveur</b><small class="ds">Shell et applications : prennent votre commande</small></div></div>
+      <div class="layer" data-i="2"><span class="ic">📖</span><div><b class="nm">Carte</b><small class="ds">Bibliothèques système (glibc) : fonctions toutes prêtes comme printf()</small></div></div>
+      <div class="zone k">ESPACE NOYAU (zone protégée)</div>
+      <div class="layer" data-i="3"><span class="ic">🪟</span><div><b class="nm">Guichet des commandes</b><small class="ds">Interface d’appels système : la seule porte vers le noyau, ex. write()</small></div></div>
+      <div class="layer" data-i="4"><span class="ic">👨‍🍳</span><div><b class="nm">Chef de cuisine</b><small class="ds">Noyau Linux : gère processus, mémoire, périphériques, fichiers, sécurité</small></div></div>
+      <div class="layer" data-i="5"><span class="ic">🔥</span><div><b class="nm">Fourneau et frigo</b><small class="ds">Matériel : processeur, RAM, disque, écran</small></div></div>
+    </div>
+    <div class="say" id="say">Appuyez sur « Lancer » pour commencer.</div>
+    <div class="screen" id="screen" aria-live="polite"></div>
+  </div>
+  <p><b>À retenir :</b> chaque couche ne parle qu’à sa voisine. Les programmes ne touchent jamais le matériel directement : le noyau le protège.</p>
+</section>
+
+<section>
+  <h2>2. D’où vient Linux ?</h2>
+  <p class="lead">Faites défiler horizontalement. Chaque étape ajoute une pièce du puzzle.</p>
+  <div class="tl" id="tl">
+    <div class="ev"><i>🏢</i><b>1969</b><span><strong>UNIX</strong> est créé aux Bell Labs par Ken Thompson et Dennis Ritchie.</span></div>
+    <div class="ev"><i>🎁</i><b>1983</b><span><strong>GNU</strong> : Richard Stallman lance un système de type UNIX entièrement libre.</span></div>
+    <div class="ev"><i>🧩</i><b>1991</b><span><strong>Noyau Linux</strong> : l’étudiant Linus Torvalds partage la pièce manquante.</span></div>
+    <div class="ev"><i>🌀</i><b>1993</b><span><strong>Debian</strong> : l’une des premières distributions.</span></div>
+    <div class="ev"><i>🟠</i><b>2004</b><span><strong>Ubuntu</strong> amène Linux sur les ordinateurs de tous les jours.</span></div>
+    <div class="ev"><i>📱</i><b>2008</b><span><strong>Android</strong> : le premier téléphone basé sur le noyau Linux.</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>3. Linux + GNU = un système complet</h2>
+  <p class="lead">Le noyau seul ne peut pas faire grand-chose. GNU fournit les outils autour. Cliquez pour les assembler.</p>
+  <div class="card">
+    <div class="eq" id="eq">
+      <div class="chip a"><b>🛠️ Outils GNU</b>Bash, GCC, glibc, ls, cp, cat</div>
+      <div class="op">+</div>
+      <div class="chip b"><b>Noyau Linux</b>Parle au matériel</div>
+      <div class="op">=</div>
+      <div class="chip res"><b>🐧 GNU/Linux</b>Un système d’exploitation complet</div>
+    </div>
+    <div class="ctrl" style="justify-content:center"><button id="join">Les assembler</button></div>
+  </div>
+  <div class="card gnu">
+    <svg viewBox="0 0 200 200" role="img" aria-label="Un gnou dessiné, l’animal derrière le nom GNU">
+      <path d="M62 78C20 70 14 30 40 22C34 44 52 58 78 62Z" fill="#e8dcc0" stroke="#6b5b3a" stroke-width="3"/>
+      <path d="M138 78C180 70 186 30 160 22C166 44 148 58 122 62Z" fill="#e8dcc0" stroke="#6b5b3a" stroke-width="3"/>
+      <path d="M62 70Q100 50 138 70Q150 120 128 160Q100 178 72 160Q50 120 62 70Z" fill="#5a5a66"/>
+      <path d="M78 160Q100 205 122 160Q100 172 78 160Z" fill="#2b2b33"/>
+      <ellipse cx="100" cy="138" rx="27" ry="22" fill="#8a8a96"/>
+      <circle cx="90" cy="140" r="4" fill="#1b1b22"/><circle cx="110" cy="140" r="4" fill="#1b1b22"/>
+      <circle cx="82" cy="98" r="10" fill="#fff"/><circle cx="118" cy="98" r="10" fill="#fff"/>
+      <circle cx="84" cy="100" r="5" fill="#1b1b22"/><circle cx="116" cy="100" r="5" fill="#1b1b22"/>
+    </svg>
+    <div>
+      <h3>GNU : la boîte à outils libre</h3>
+      <p>GNU signifie <b>« GNU’s Not Unix »</b> (« GNU n’est pas Unix »). Le nom se contient lui-même : c’est une blague de programmeurs appelée acronyme récursif. Richard Stallman l’a lancé en 1983 pour que chacun puisse exécuter, étudier, modifier et partager les logiciels.</p>
+      <div class="acr" id="acr">GNU</div>
+      <button class="alt" id="exp">Développer le nom</button>
+    </div>
+  </div>
+  <div class="who">
+    <div class="card"><h3>⚙️ Noyau Linux</h3><small>Linus Torvalds, 1991</small><p>Le moteur. Il gère le processeur, la mémoire, les périphériques et les fichiers. Il n’a ni shell, ni commandes, ni applications.</p></div>
+    <div class="card"><h3>🛠️ GNU</h3><small>Richard Stallman, 1983</small><p>Les outils autour du moteur : Bash, GCC, glibc, et des commandes comme ls, cp et cat.</p></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h3>Linux est-il un noyau ou un système d’exploitation ?</h3>
+    <div class="car" id="car" aria-hidden="true"><span class="eng">⚙️</span><span class="part">🛞</span><span class="part">🎛️</span><span class="part">💺</span><span class="whole">🚗</span></div>
+    <div class="cap" id="cap">Un moteur seul ne peut aller nulle part. C’est le noyau Linux seul.</div>
+    <div class="ctrl" style="justify-content:center"><button id="addgnu">Ajouter les outils GNU</button></div>
+    <div class="verdict"><b>Réponse :</b> à proprement parler, <b>Linux n’est que le noyau</b>. Un système d’exploitation complet est <b>GNU/Linux</b> (noyau + outils GNU). Dans la vie courante, on dit « Linux » pour tout le système, comme Ubuntu ou Debian, mais la partie qui s’appelle vraiment Linux est le noyau.</div>
+  </div>
+  <p><b>Open source</b> signifie que tout le monde peut lire, modifier et partager le code, et même créer sa propre version de Linux.</p>
+</section>
+
+<section>
+  <h2>4. Les distributions : même noyau, emballage différent</h2>
+  <p class="lead">Une distribution = noyau Linux + outils GNU + gestionnaire de paquets + bureau et applications, assemblés pour un usage précis. Pensez au même moteur dans différentes voitures.</p>
+  <div class="fam">
+    <div class="card"><h3>Famille Debian</h3><span class="tag">Debian</span><span class="tag">Ubuntu</span><span class="tag">Kali</span><span class="tag">Parrot OS</span></div>
+    <div class="card"><h3>Famille Red Hat</h3><span class="tag">RHEL</span><span class="tag">Fedora</span><span class="tag">Rocky Linux</span></div>
+    <div class="card"><h3>Indépendantes</h3><span class="tag">Arch</span><span class="tag">Gentoo</span><span class="tag">SUSE</span></div>
+  </div>
+  <div class="base">⬆ Toutes reposent sur le même noyau Linux ⬆</div>
+  <p>Quelle distribution j’utilise ? Tapez <code>cat /etc/os-release</code></p>
+</section>
+
+<section>
+  <h2>5. Terminal, shell, CLI, GUI</h2>
+  <p class="lead">Quatre mots que les étudiants confondent souvent.</p>
+  <div class="two">
+    <div class="card">
+      <h3>CLI : taper des commandes</h3>
+      <div class="term"><div class="bar">🪟 Terminal (la fenêtre)</div><div class="body">$ <span class="type">ls Documents</span></div></div>
+      <div class="nest">🐚 <b>Shell</b> (Bash, Zsh, Fish) : le programme <em>dans</em> la fenêtre. Il lit votre commande et la transmet au noyau.</div>
+    </div>
+    <div class="card">
+      <h3>GUI : cliquer et glisser</h3>
+      <div class="gui"><span>📁</span><span>🌐</span><span>📝</span><span>🎵</span><span>🖼️</span><span>⚙️</span><span>🗑️</span><span>📧</span><em>🖱️</em></div>
+      <p>Fenêtres, icônes et souris. Exemples : GNOME, KDE.</p>
+    </div>
+  </div>
+  <p><b>Le trajet d’une commande :</b> Vous → Terminal → Shell → Noyau</p>
+  <p>La CLI est rapide et automatisable : serveurs et DevOps l’utilisent. La GUI est plus facile à apprendre.</p>
+</section>
+
+<section>
+  <h2>Testez-vous</h2>
+  <details><summary>Qui a lancé le projet GNU, et quand ?</summary><p>Richard Stallman, en 1983.</p></details>
+  <details><summary>Linux ou GNU/Linux ?</summary><p>Linux n’est que le noyau. GNU/Linux est le noyau plus les outils GNU : un système complet.</p></details>
+  <details><summary>Quelle couche permet aux applications de demander des services au noyau ?</summary><p>L’interface d’appels système.</p></details>
+  <details><summary>Terminal ou shell ?</summary><p>Le terminal est la fenêtre. Le shell est le programme à l’intérieur qui interprète vos commandes.</p></details>
+</section>
+
+</main>
+<script>
+(function(){
+var L=[].slice.call(document.querySelectorAll('.layer')),say=document.getElementById('say'),scr=document.getElementById('screen');
+var fun=true,busy=false;
+var real=['Vous (utilisateur)','Shell / application','Bibliothèque système','Appel système','Noyau Linux','Matériel'];
+var fn=[];L.forEach(function(l){fn.push(l.querySelector('.nm').textContent)});
+var steps=[
+ ['Vous demandez que le texte « Hello » s’affiche. Votre commande est passée.','Votre programme appelle printf("Hello").'],
+ ['Le serveur prend la commande.','Le shell ou l’application reçoit la demande.'],
+ ['La carte propose une recette toute prête.','glibc transforme printf() en appel write().'],
+ ['La commande passe par l’unique guichet autorisé.','L’appel système write() passe de l’espace utilisateur à l’espace noyau.'],
+ ['Le chef décide comment cuisiner et qui peut utiliser le fourneau.','Le noyau vérifie les permissions et sollicite le pilote du périphérique.'],
+ ['Le fourneau fait le vrai travail.','Le matériel affiche le texte à l’écran.']
+];
+var back=['Le résultat remonte…','…et arrive jusqu’à vous.'];
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
+function show(i){L.forEach(function(l,k){l.classList.toggle('on',k===i)})}
+document.getElementById('swap').onclick=function(){
+ fun=!fun;L.forEach(function(l,k){l.querySelector('.nm').textContent=fun?fn[k]:real[k]});
+ this.textContent=fun?'Passer aux vrais noms':'Passer au restaurant';
+};
+document.getElementById('run').onclick=async function(){
+ if(busy)return;busy=true;scr.textContent='';
+ for(var i=0;i<steps.length;i++){show(i);say.textContent=steps[i][fun?0:1];L[i].scrollIntoView({block:'nearest',behavior:'smooth'});await sleep(1500)}
+ scr.textContent='$ Hello';
+ for(var j=4;j>=0;j-=2){show(j);say.textContent=back[(4-j)/2];await sleep(900)}
+ show(-1);say.textContent='Terminé. Un mot à l’écran, et six couches ont travaillé ensemble.';busy=false;
+};
+var io=new IntersectionObserver(function(es){es.forEach(function(e,i){if(e.isIntersecting){setTimeout(function(){e.target.classList.add('in')},i*180)}})},{threshold:.3});
+document.querySelectorAll('.ev').forEach(function(e){io.observe(e)});
+document.getElementById('join').onclick=function(){document.getElementById('eq').classList.add('done');this.textContent='GNU/Linux est né'};
+var car=document.getElementById('car'),cap=document.getElementById('cap'),ag=document.getElementById('addgnu');
+ag.onclick=function(){var f=car.classList.toggle('full');cap.textContent=f?'Moteur + roues, volant et sièges = une voiture utilisable. Noyau + outils GNU = un système d’exploitation complet.':'Un moteur seul ne peut aller nulle part. C’est le noyau Linux seul.';ag.textContent=f?'Retirer les outils GNU':'Ajouter les outils GNU'};
+var acr=document.getElementById('acr'),lv=0;
+document.getElementById('exp').onclick=function(){lv=(lv+1)%5;var s='GNU';for(var i=0;i<lv;i++){s=(i?'('+s+')':s)+'\u2019s Not Unix'}acr.textContent=lv?s+(lv>2?' \u2026':''):'GNU'};
+})();
+</script>
+</body>
+</html>
